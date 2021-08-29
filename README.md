@@ -53,6 +53,29 @@ spec:
 Pods with this label will skip the sidecar setup.
 
 
+### Use network port instead of unix socket
+
+The sidecar communicates by default via a unix socket.
+
+To communicate via a network port add the label `network-health-sidecar/port: "8181"`.
+
+``` yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: network-health-test-pod-disabled
+  namespace: network-health-test
+  labels:
+    network-health-sidecar/port: "8181"
+spec:
+  containers:
+    - name: example
+      image: nginx
+```
+
+Pods with this label will use port 8181 and define a http redinessProbe instead of a exec readinessProbe.
+
+
 ## local development
 
 1. install [tilt](https://docs.tilt.dev/install.html), [helm](https://helm.sh/docs/intro/install/#from-script), [helmfile](https://github.com/roboll/helmfile#installation), [helm diff](https://github.com/databus23/helm-diff#using-helm-plugin-manager--23x), and [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
