@@ -15,6 +15,7 @@ k8s_resource(
 
 k8s_resource('network-health-webhook-available', resource_deps=['network-health-admission-controller'])
 k8s_resource('network-health-test-pod', resource_deps=['network-health-webhook-available'])
+k8s_resource('network-health-test-pod-disabled', resource_deps=['network-health-webhook-available'])
 
 target='prod'
 live_update=[]

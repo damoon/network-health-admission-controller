@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -47,14 +48,21 @@ func (a *networkHealthSidecarInjector) Handle(ctx context.Context, req admission
 }
 
 func prepare(pod *v1.Pod) {
-	if pod.Annotations == nil {
-		pod.Annotations = map[string]string{}
+	if pod.Labels == nil {
+		pod.Labels = map[string]string{}
 	}
 
-	pod.Annotations["network-health-sidecar/enabled"] = "true"
+	_, found := pod.Labels["network-health-sidecar/enabled"]
+	if !found {
+		pod.Labels["network-health-sidecar/enabled"] = "true"
+	}
 }
 
 func container(pod *v1.Pod) *v1.Container {
+	if strings.ToLower(pod.Labels["network-health-sidecar/enabled"]) != "true" {
+		return nil
+	}
+
 	return &v1.Container{
 		Name:  "network-health-sidecar",
 		Image: "ghcr.io/damoon/network-health-sidecar:latest",

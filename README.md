@@ -16,18 +16,41 @@ This admission controller acts as a [MutatingAdmissionWebhook](https://kubernete
 
 ## Usage
 
+### Enable admission controller for a namespace
+
 Create a namespace and add the label `network-health-sidecar/enabled: "true"`.
 
 ``` yaml
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: example
+  name: network-health-test
   labels:
     network-health-sidecar/enabled: "true"
 ```
 
 All pods created in this namespace start with an additional [network health sidecar](https://github.com/damoon/network-health-sidecar) container.
+
+
+### Disable for a pod
+
+Create a pod and add the label `network-health-sidecar/enabled: "false"`.
+
+``` yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: network-health-test-pod-disabled
+  namespace: network-health-test
+  labels:
+    network-health-sidecar/enabled: "false"
+spec:
+  containers:
+    - name: example
+      image: nginx
+```
+
+Pods with this label will skip the sidecar setup.
 
 
 ## local development
