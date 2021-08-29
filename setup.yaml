@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: network-health-admission-controller
+  namespace: kube-system
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: network-health-admission-controller
+  template:
+    metadata:
+      labels:
+        app: network-health-admission-controller
+    spec:
+      containers:
+      - name: webhook
+        image: ghcr.io/damoon/network-health-admission-controller:latest
+        ports:
+        - name: metrics
+          containerPort: 8080
+        - name: webhook
+          containerPort: 9443
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 9443
+            scheme: HTTPS
+        volumeMounts:
+        - name: certs
+          mountPath: "/tmp/k8s-webhook-server/serving-certs/"
+          readOnly: true
+      volumes:
+      - name: certs
+        secret:
+          secretName: network-health-certificate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: network-health
+  namespace: kube-system
+spec:
+  selector:
+    app: network-health-admission-controller
+  ports:
+    - name: metrics
+      protocol: TCP
+      port: 8080
+    - name: webhook
+      protocol: TCP
+      port: 9443
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: network-health
+  labels:
+    app: network-health
+  annotations:
+    cert-manager.io/inject-ca-from: kube-system/network-health-certificate
+webhooks:
+  - name: network-health.kube-system.svc.cluster.local
+    rules:
+      - operations: ["CREATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+        scope: "Namespaced"
+    clientConfig:
+      service:
+        name: network-health
+        namespace: kube-system
+        path: "/webhook"
+        port: 9443
+    admissionReviewVersions: ["v1", "v1beta1"]
+    sideEffects: None
+    namespaceSelector:
+      matchLabels:
+        network-health-sidecar/enabled: "true"
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: network-health-certificate
+  namespace: kube-system
+spec:
+  secretName: network-health-certificate
+  dnsNames:
+  - network-health.kube-system.svc
+  issuerRef:
+    name: network-health-selfsign-issues
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: network-health-selfsign-issues
+  namespace: kube-system
+spec:
+  selfSigned: {}

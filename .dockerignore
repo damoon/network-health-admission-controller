@@ -1,0 +1,11 @@
+.git
+vendor
+.dockerignore
+.gitignore
+.github
+Dockerfile
+*.yaml
+README.md
+renovate.json
+LICENSE
+kubernetes.yaml
