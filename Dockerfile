@@ -19,7 +19,7 @@ COPY mutatingwebhook.go .
 RUN go install .
 
 # production image ############################################
-FROM alpine:3.15.4@sha256:4edbd2beb5f78b1014028f4fbb99f3237d9561100b6881aabbf5acce2c4f9454 AS prod
+FROM alpine:3.15.4@sha256:315a3eab8ebf3bbcb931e34d13684b1e53186b8ec342c64383ce5c64890771ab AS prod
 RUN apk add --no-cache ca-certificates
 
 COPY --from=build-env /go/bin/network-health-admission-controller /bin/admission-controller
