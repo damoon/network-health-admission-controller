@@ -1,6 +1,6 @@
 module github.com/damoon/network-health-admission-controller
 
-go 1.17
+go 1.18
 
 require (
 	k8s.io/api v0.22.4
