@@ -43,7 +43,7 @@ jobs:
           setup-tools: |
             tilt
             helm
-          tilt: 'v0.33.5'
+          tilt: 'v0.33.6'
           helm: 'v3.6.3'
       - name: Install helmfile
         run: |
@@ -72,7 +72,7 @@ jobs:
           setup-tools: |
             tilt
             helm
-          tilt: 'v0.33.5'
+          tilt: 'v0.33.6'
           helm: 'v3.6.3'
       - name: Install helmfile
         run: |
