@@ -13,7 +13,7 @@ jobs:
         uses: golangci/golangci-lint-action@3cfe3a4abbb849e10058ce4af15d205b6da42804 # v4
         with:
           # Required: the version of golangci-lint is required and must be specified without patch version: we always use the latest patch version.
-          version: v1.53.3
+          version: v1.61.0
           args: --timeout=5m
   test:
     name: Verify go test
@@ -24,7 +24,7 @@ jobs:
       - name: Setup golang
         uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5
         with:
-          go-version: '1.17.0'
+          go-version: v1.61.0
       - name: Print go version
         run: go version
       - name: Execute go tests 
